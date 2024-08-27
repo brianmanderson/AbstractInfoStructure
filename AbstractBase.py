@@ -779,6 +779,7 @@ class PatientDatabases(BaseMethod):
         if not os.path.exists(database_path):
             os.makedirs(database_path)
         for db in self.Databases.values():
+            print(f"Writing {db.DBName}")
             db_path = os.path.join(database_path, db.DBName)
             if not os.path.exists(db_path):
                 os.makedirs(db_path)
