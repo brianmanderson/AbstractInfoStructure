@@ -507,6 +507,13 @@ class StrippedDownPlan(BaseMethod):
     PlannedBy: str or None
     Review: ReviewClass or None
 
+    def build(self, treatment_plan: TreatmentPlanClass):
+        self.PlanName = treatment_plan.PlanName
+        if hasattr(treatment_plan, "PlannedBy"):
+            self.PlannedBy = treatment_plan.PlannedBy
+        if hasattr(treatment_plan, "Review"):
+            self.Review = treatment_plan.Review
+
 
 class StrippedDownRegionOfInterest(BaseMethod):
     Name: str
@@ -534,6 +541,20 @@ class StrippedDownCase(BaseMethod):
                 review = tp.Review
                 if review.ApprovalStatus != "Approved":
                     self.TreatmentPlans.remove(tp)
+
+    def build(self, case: CaseClass):
+        self.CaseName = case.CaseName
+        self.BodySite = case.BodySite
+        for i in case.Base_ROIs:
+            stripped_down_roi = StrippedDownRegionOfInterest()
+            stripped_down_roi.Name = i.Name
+            stripped_down_roi.Type = i.Type
+            self.ROIS.append(stripped_down_roi)
+        self.POIS = [i.Name for i in case.Base_POIs]
+        for tp in case.TreatmentPlans:
+            treatment_plan = StrippedDownPlan()
+            treatment_plan.build(tp)
+            self.TreatmentPlans.append(treatment_plan)
 
 
 class PatientHeader(BaseMethod):
@@ -570,6 +591,15 @@ class PatientHeader(BaseMethod):
         out_file_name += "_Header.json"
         out_file = os.path.join(directory_path, out_file_name)
         self.to_json_file(out_file)
+
+    def build(self, patient: PatientClass):
+        self.MRN = patient.MRN
+        self.RS_UID = patient.RS_UID
+        self.DateLastModified = patient.DateLastModified
+        for case in patient.Cases:
+            new_case = StrippedDownCase()
+            new_case.build(case)
+            self.Cases.append(new_case)
 
 
 class PatientDatabase(BaseMethod):
