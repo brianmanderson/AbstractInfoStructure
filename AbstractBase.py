@@ -12,6 +12,46 @@ except ImportError:
     load_parallel = False
 
 
+def compare_dicts(dict1, dict2):
+    # Check if both arguments are dictionaries
+    if not isinstance(dict1, dict) or not isinstance(dict2, dict):
+        return dict1 == dict2
+
+    # Check if the keys are the same in both dictionaries
+    if set(dict1.keys()) != set(dict2.keys()):
+        print(dict1.keys())
+        return False
+
+    # Recursively compare values for each key
+    for key in dict1.keys():
+        if not compare_values(dict1[key], dict2[key]):
+            """
+            This might look weird, but 'nan' does not equal itself
+            We are now checking to see if both values are 'nan', if so, great!
+            """
+            if dict1[key] == dict1[key] or dict2[key] == dict2[key]:
+                return False
+
+    return True
+
+
+def compare_values(value1, value2):
+    if isinstance(value1, list) and isinstance(value2, list):
+        if len(value1) != len(value2):
+            print(value1)
+            return False
+        for v1, v2 in zip(value1, value2):
+            if not compare_values(v1, v2):
+                return False
+        return True
+    elif isinstance(value1, dict) and isinstance(value2, dict):
+        return compare_dicts(value1, value2)
+    elif hasattr(value1, '__dict__') and hasattr(value2, '__dict__'):
+        return compare_dicts(value1.__dict__, value2.__dict__)
+    else:
+        return value1 == value2
+
+
 def add_patient(a):
     patient_dictionary: PatientDatabase.Patients
     q: Queue
