@@ -36,6 +36,25 @@ def update_database(network_path, local_path):
                                   network_database_path=network_path, tqdm=tqdm)
 
 
+def identify_wanted_headers(patient_header_dbs: PatientHeaderDatabases,
+                            wanted_roi_list: List[str], wanted_type: List[str]):
+    out_header_dbs = PatientHeaderDatabases()
+    wanted_type = [i.lower() for i in wanted_type]
+    for pat_header_db in patient_header_dbs.HeaderDatabases.values():
+        out_header_db = PatientHeaderDatabase(pat_header_db.DBName)
+        for pat in pat_header_db.PatientHeaders.values():
+            has_roi = False
+            for case in pat.Cases:
+                wanted_rois = [r for r in case.ROIS if r.Name.lower() in wanted_roi_list and
+                               r.Type.lower() in wanted_type]
+                if wanted_rois:
+                    has_roi = True
+            if has_roi:
+                out_header_db.PatientHeaders[pat.RS_UID] = pat
+        out_header_dbs.HeaderDatabases[out_header_db.DBName] = out_header_db
+    return out_header_dbs
+
+
 def copy_file(a):
     q: Queue
     q, pbar = a
