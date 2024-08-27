@@ -1,5 +1,9 @@
 from .AbstractBase import *
 try:
+    from tqdm import tqdm
+except:
+    tqdm = None
+try:
     from threading import Thread
     from queue import *
     from multiprocessing import cpu_count
@@ -10,6 +14,26 @@ try:
     import shutil
 except ImportError:
     print("Unable to import shuttle, cannot update local database")
+
+
+def update_database(network_path, local_path):
+    today = DateTimeClass()
+    today.from_python_datetime(datetime.today())
+    last_update_date = os.path.join(local_path, "Last_Updated.txt")
+    if not os.path.exists(last_update_date):
+        update_local_database(local_database_path=local_path,
+                              network_database_path=network_path, tqdm=tqdm)
+    else:
+        last_update = DateTimeClass()
+        fid = open(last_update_date)
+        dates = fid.readline().split('.')
+        fid.close()
+        last_update.year = int(dates[0])
+        last_update.month = int(dates[1])
+        last_update.day = int(dates[2])
+        if (today - last_update).days >= 1:
+            update_local_database(local_database_path=local_path,
+                                  network_database_path=network_path, tqdm=tqdm)
 
 
 def copy_file(a):
