@@ -16,6 +16,30 @@ except ImportError:
     print("Unable to import shuttle, cannot update local database")
 
 
+def find_all_rois(header_databases: PatientHeaderDatabases):
+    """
+    :param header_databases:
+    :return:
+    """
+    all_rois = []
+    for header_database in header_databases.HeaderDatabases.values():
+        for pat in header_database.PatientHeaders.values():
+            for case in pat.Cases:
+                for roi in case.ROIS:
+                    if roi.Name.lower() not in all_rois:
+                        all_rois.append(roi.Name.lower())
+    """
+    Remove PTV contours, opts, tuning structures, and DNU
+    """
+    reduced_all_rois = [i for i in all_rois if i.find('ptv') == -1 and i.find('opt') == -1 and i.find('hot') == -1 and
+                        i.find('cold') == -1 and i.find('avo') == -1 and i.find('norm') == -1 and i.find('tune') == -1
+                        and len(i) > 2 and i.find('ring') == -1 and i.find('couch') == -1 and i.find('max') == -1
+                        and i.find('min') == -1 and i.find('push') == -1 and i.find('shell') == -1
+                        and i.find('warm') == -1 and i.find('avd') == -1 and i.find('dnu') == -1
+                        and i.find('notused') == -1]
+    return reduced_all_rois
+
+
 def update_database(network_path, local_path):
     today = DateTimeClass()
     today.from_python_datetime(datetime.today())
