@@ -503,6 +503,18 @@ class PatientClass(BaseMethod):
     def __init__(self):
         self.Cases = []
 
+    def define_rs_uid(self):
+        illegal_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
+        rs_id = self.MRN
+        for c in illegal_chars:
+            rs_id = rs_id.replace(c, "")
+        self.RS_UID = rs_id
+
+    def build_from_info(self, rs_info):
+        self.MRN = rs_info['PatientID']
+        self.define_rs_uid()
+        self.DateLastModified = rs_info['LastModified']
+
     def delete_unapproved_cases(self):
         """
         Delete cases without approved plans, and delete unapproved plans
