@@ -493,15 +493,22 @@ class CaseClass(BaseMethod):
                     self.TreatmentPlans.remove(tp)
 
 
+class TreatmentNoteClass(BaseMethod):
+    DateLastEdited: DateTimeClass
+    Note: str
+
+
 class PatientClass(BaseMethod):
     RS_UID: str
     Patient_UID: int = 0
     Cases: List[CaseClass]
     DateLastModified: DateTimeClass
     MRN: str
+    TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
         self.Cases = []
+        self.TreatmentNotes = []
 
     def define_rs_uid(self):
         illegal_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
@@ -615,9 +622,11 @@ class PatientHeader(BaseMethod):
     FilePath: Union[str, bytes, os.PathLike]
     DateLastModified: DateTimeClass
     Cases: List[StrippedDownCase]
+    TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
         self.Cases = []
+        self.TreatmentNotes = []
 
     def delete_unapproved_cases(self):
         """
