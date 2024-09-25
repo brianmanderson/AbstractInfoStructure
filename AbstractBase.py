@@ -661,6 +661,11 @@ class PatientHeader(BaseMethod):
             new_case = StrippedDownCase()
             new_case.build(case)
             self.Cases.append(new_case)
+        for tx_note in patient.TreatmentNotes:
+            new_note = TreatmentNoteClass()
+            new_note.Note = tx_note.Note
+            new_note.DateLastEdited = tx_note.DateLastEdited
+            self.TreatmentNotes.append(new_note)
 
 
 class PatientDatabase(BaseMethod):
