@@ -244,6 +244,7 @@ class DateTimeClass(BaseMethod):
     def __repr__(self):
         return str(self.month) + '/' + str(self.day) + '/' + str(self.year)
 
+
 class MultipleDateTimes(BaseMethod):
     Number_list: List[int]
     Number_dict: Dict[str, int]
@@ -423,7 +424,6 @@ class BeamSetClass(BaseMethod):
     Beams: List[BeamClass]
     MachineReference: MachineReferenceClass or None
     FractionDose: FractionDoseClass or None
-
 
     def __init__(self):
         self.Prescriptions = []
