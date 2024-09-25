@@ -244,6 +244,7 @@ class DateTimeClass(BaseMethod):
     def __repr__(self):
         return str(self.month) + '/' + str(self.day) + '/' + str(self.year)
 
+
 class MultipleDateTimes(BaseMethod):
     Number_list: List[int]
     Number_dict: Dict[str, int]
@@ -262,10 +263,16 @@ class RoiMaterial(BaseMethod):
     Name: str
     MassDensity: float
 
+    def __repr__(self):
+        return self.Name
+
 
 class OrganDataClass(BaseMethod):
     OrganType: str
     ResponseFunctionTissueName: str
+
+    def __repr__(self):
+        return self.ResponseFunctionTissueName
 
 
 class RegionOfInterestBase(BaseMethod):
@@ -275,6 +282,9 @@ class RegionOfInterestBase(BaseMethod):
     Base_ROI_UID: int = 0
     ROI_Material: RoiMaterial or None
     OrganData: OrganDataClass or None
+
+    def __repr__(self):
+        return self.Name
 
 
 class PointOfInterestBase(BaseMethod):
@@ -286,6 +296,9 @@ class PointOfInterestBase(BaseMethod):
     ROI_Material: RoiMaterial or None
     OrganData: OrganDataClass or None
 
+    def __repr__(self):
+        return self.Name
+
 
 class PointOfInterest(BaseMethod):
     Name: str
@@ -295,6 +308,9 @@ class PointOfInterest(BaseMethod):
     x: float
     y: float
     z: float
+
+    def __repr__(self):
+        return self.Name
 
 
 class RegionOfInterest(BaseMethod):
@@ -306,6 +322,9 @@ class RegionOfInterest(BaseMethod):
     HU_Max: float
     HU_Average: float
     Defined: bool
+
+    def __repr__(self):
+        return self.Name
 
 
 class EquipmentInfoClass(BaseMethod):
@@ -331,6 +350,9 @@ class ExaminationClass(BaseMethod):
         self.EquipmentInfo = None
         self.Exam_DateTime = None
 
+    def __repr__(self):
+        return self.ExamName
+
 
 class RegionOfInterestDose(BaseMethod):
     AbsoluteDose: List[float]  # DVH will be the dose at relative volume from 1-100%
@@ -346,6 +368,9 @@ class RegionOfInterestDose(BaseMethod):
     dvh_step: float = 0.01
     AttemptedUpdate: bool = False
 
+    def __repr__(self):
+        return self.Name
+
 
 class PointOfInterestDose(BaseMethod):
     Dose_cGy: float
@@ -354,12 +379,18 @@ class PointOfInterestDose(BaseMethod):
     RS_Number: int
     ScalingFactor: int = 1
 
+    def __repr__(self):
+        return self.Name
+
 
 class DoseSpecificationPointClass(BaseMethod):
     x: float
     y: float
     z: float
     Name: str
+
+    def __repr__(self):
+        return self.Name
 
 
 class PrescriptionClass(BaseMethod):
@@ -392,10 +423,16 @@ class BeamClass(BaseMethod):
     BeamNumber_UID: int = 0
     SSD: float = -1.0  # Defaults to -1, can only be defined if an external ROI is present
 
+    def __repr__(self):
+        return self.Description
+
 
 class MachineReferenceClass(BaseMethod):
     MachineName: str
     CommissioningTime: DateTimeClass or None
+
+    def __repr__(self):
+        return self.MachineName
 
 
 class FractionDoseClass(BaseMethod):
@@ -407,6 +444,9 @@ class FractionDoseClass(BaseMethod):
     def __init__(self):
         self.DosePOIs = []
         self.DoseROIs = []
+
+    def __repr__(self):
+        return self.Name
 
 
 class BeamSetClass(BaseMethod):
@@ -424,10 +464,12 @@ class BeamSetClass(BaseMethod):
     MachineReference: MachineReferenceClass or None
     FractionDose: FractionDoseClass or None
 
-
     def __init__(self):
         self.Prescriptions = []
         self.Beams = []
+
+    def __repr__(self):
+        return self.DicomPlanLabel
 
 
 class PlanOptimizationClass(BaseMethod):
@@ -444,6 +486,9 @@ class ReviewClass(BaseMethod):
     ReviewerName: str  # The credentials of the reviewer
     ReviewTime: DateTimeClass  # The datetime when the review was performed
 
+    def __repr__(self):
+        return self.ApprovalStatus
+
 
 class TreatmentPlanClass(BaseMethod):
     PlanName: str
@@ -454,6 +499,9 @@ class TreatmentPlanClass(BaseMethod):
     Optimizations: List[PlanOptimizationClass]
     Referenced_Exam_Name: str
     Review: ReviewClass or None
+
+    def __repr__(self):
+        return self.PlanName
 
 
 class RegistrationClass(BaseMethod):
@@ -493,6 +541,9 @@ class CaseClass(BaseMethod):
                 review = tp.Review
                 if review.ApprovalStatus != "Approved":
                     self.TreatmentPlans.remove(tp)
+
+    def __repr__(self):
+        return self.CaseName + ' : ' + self.BodySite
 
 
 class TreatmentNoteClass(BaseMethod):
@@ -562,6 +613,9 @@ class PatientClass(BaseMethod):
         if os.path.exists(out_file.replace(".json", ".txt")):
             os.remove(out_file.replace(".json", ".txt"))
 
+    def __repr__(self):
+        return self.MRN
+
 
 class StrippedDownPlan(BaseMethod):
     PlanName: str
@@ -575,10 +629,16 @@ class StrippedDownPlan(BaseMethod):
         if hasattr(treatment_plan, "Review"):
             self.Review = treatment_plan.Review
 
+    def __repr__(self):
+        return self.PlanName
+
 
 class StrippedDownRegionOfInterest(BaseMethod):
     Name: str
     Type: str
+
+    def __repr__(self):
+        return self.Name
 
 
 class StrippedDownCase(BaseMethod):
@@ -616,6 +676,9 @@ class StrippedDownCase(BaseMethod):
             treatment_plan = StrippedDownPlan()
             treatment_plan.build(tp)
             self.TreatmentPlans.append(treatment_plan)
+
+    def __repr__(self):
+        return self.CaseName + ' : ' + self.BodySite
 
 
 class PatientHeader(BaseMethod):
@@ -668,6 +731,9 @@ class PatientHeader(BaseMethod):
             new_note.Note = tx_note.Note
             new_note.DateLastEdited = tx_note.DateLastEdited
             self.TreatmentNotes.append(new_note)
+
+    def __repr__(self):
+        return self.MRN
 
 
 class PatientDatabase(BaseMethod):
