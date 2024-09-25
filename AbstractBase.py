@@ -241,6 +241,8 @@ class DateTimeClass(BaseMethod):
         self.hour = int(hour)
         self.minute = int(minute)
 
+    def __repr__(self):
+        return str(self.month) + '/' + str(self.day) + '/' + str(self.year)
 
 class MultipleDateTimes(BaseMethod):
     Number_list: List[int]
