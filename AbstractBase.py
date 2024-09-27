@@ -549,6 +549,11 @@ class CaseClass(BaseMethod):
 class TreatmentNoteClass(BaseMethod):
     DateLastEdited: DateTimeClass
     Note: str
+    StaffFirstName: str
+    StaffLastName: str
+
+    def __repr__(self):
+        return self.StaffFirstName + ' ' + self.StaffLastName
 
 
 class PatientClass(BaseMethod):
