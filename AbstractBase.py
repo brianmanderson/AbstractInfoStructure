@@ -553,7 +553,7 @@ class TreatmentNoteClass(BaseMethod):
     StaffLastName: str
 
     def __repr__(self):
-        return self.StaffFirstName + ' ' + self.StaffLastName
+        return self.DateLastEdited.__repr__() + ': ' + self.StaffFirstName + ' ' + self.StaffLastName
 
 
 class PatientClass(BaseMethod):
