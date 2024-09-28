@@ -282,6 +282,7 @@ class RegionOfInterestBase(BaseMethod):
     Base_ROI_UID: int = 0
     ROI_Material: RoiMaterial or None
     OrganData: OrganDataClass or None
+    StructureCode: str or None
 
     def __repr__(self):
         return self.Name
@@ -574,11 +575,6 @@ class PatientClass(BaseMethod):
         for c in illegal_chars:
             rs_id = rs_id.replace(c, "")
         self.RS_UID = rs_id
-
-    def build_from_info(self, rs_info):
-        self.MRN = rs_info['PatientID']
-        self.define_rs_uid()
-        self.DateLastModified = rs_info['LastModified']
 
     def delete_unapproved_cases(self):
         """
