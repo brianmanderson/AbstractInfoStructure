@@ -351,9 +351,6 @@ class ExaminationClass(BaseMethod):
         self.EquipmentInfo = None
         self.Exam_DateTime = None
 
-    def update_exam(self, *args):
-        pass
-
     def __repr__(self):
         return self.ExamName
 
