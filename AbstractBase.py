@@ -562,9 +562,13 @@ class PatientClass(BaseMethod):
     Cases: List[CaseClass]
     DateLastModified: DateTimeClass
     MRN: str
+    Name_First: str
+    Name_Last: str
     TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
+        self.Name_First = ''
+        self.Name_Last = ''
         self.Cases = []
         self.TreatmentNotes = []
 
@@ -688,6 +692,8 @@ class StrippedDownCase(BaseMethod):
 
 class PatientHeader(BaseMethod):
     MRN: str
+    Name_First: str
+    Name_Last: str
     RS_UID: str
     FilePath: Union[str, bytes, os.PathLike]
     DateLastModified: DateTimeClass
@@ -725,6 +731,8 @@ class PatientHeader(BaseMethod):
 
     def build(self, patient: PatientClass):
         self.MRN = patient.MRN
+        self.Name_Last = patient.Name_Last
+        self.Name_First = patient.Name_First
         self.RS_UID = patient.RS_UID
         self.DateLastModified = patient.DateLastModified
         for case in patient.Cases:
