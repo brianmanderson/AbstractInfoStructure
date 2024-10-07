@@ -282,6 +282,7 @@ class RegionOfInterestBase(BaseMethod):
     Base_ROI_UID: int = 0
     ROI_Material: RoiMaterial or None
     OrganData: OrganDataClass or None
+    StructureCode: str or None
 
     def __repr__(self):
         return self.Name
@@ -542,6 +543,9 @@ class CaseClass(BaseMethod):
                 if review.ApprovalStatus != "Approved":
                     self.TreatmentPlans.remove(tp)
 
+    def add_all_treatment_plans(self, rs_case):
+        pass
+
     def __repr__(self):
         return self.CaseName + ' : ' + self.BodySite
 
@@ -580,11 +584,6 @@ class PatientClass(BaseMethod):
         for c in illegal_chars:
             rs_id = rs_id.replace(c, "")
         self.RS_UID = rs_id
-
-    def build_from_info(self, rs_info):
-        self.MRN = rs_info['PatientID']
-        self.define_rs_uid()
-        self.DateLastModified = rs_info['LastModified']
 
     def delete_unapproved_cases(self):
         """
@@ -891,7 +890,7 @@ class PatientHeaderDatabase(BaseMethod):
                 pat_mrn = "_".join(potential_file.split('_')[:-2])
                 if pat_mrn in specific_mrns:
                     wanted_files.append(potential_file)
-                elif pat_mrn.strip('0') in specific_mrns:
+                elif pat_mrn.strip('0') in specific_mrns or pat_mrn.lstrip('0') in specific_mrns:
                     wanted_files.append(potential_file)
                 elif max([pat_mrn.zfill(i) in specific_mrns for i in range(len(pat_mrn), max([len(pat_mrn) + 3, 10]))]):
                     wanted_files.append(potential_file)
