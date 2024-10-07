@@ -564,11 +564,13 @@ class PatientClass(BaseMethod):
     MRN: str
     Name_First: str
     Name_Last: str
+    Gender: int  # 0 M, 1 F
     TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
         self.Name_First = ''
         self.Name_Last = ''
+        self.Gender = -1
         self.Cases = []
         self.TreatmentNotes = []
 
@@ -694,6 +696,7 @@ class PatientHeader(BaseMethod):
     MRN: str
     Name_First: str
     Name_Last: str
+    Gender: int
     RS_UID: str
     FilePath: Union[str, bytes, os.PathLike]
     DateLastModified: DateTimeClass
@@ -731,6 +734,7 @@ class PatientHeader(BaseMethod):
 
     def build(self, patient: PatientClass):
         self.MRN = patient.MRN
+        self.Gender = patient.Gender
         self.Name_Last = patient.Name_Last
         self.Name_First = patient.Name_First
         self.RS_UID = patient.RS_UID
