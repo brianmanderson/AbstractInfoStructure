@@ -568,7 +568,7 @@ class PatientClass(BaseMethod):
     MRN: str
     Name_First: str
     Name_Last: str
-    Gender: int  # 0 M, 1 F
+    Gender: int  # 0 M, 1 F, -1 Unknown
     TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
@@ -705,6 +705,9 @@ class PatientHeader(BaseMethod):
     def __init__(self):
         self.Cases = []
         self.TreatmentNotes = []
+        self.Name_First = ''
+        self.Name_Last = ''
+        self.Gender = -1
 
     def delete_unapproved_cases(self):
         """
