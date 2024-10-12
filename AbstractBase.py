@@ -569,6 +569,7 @@ class PatientClass(BaseMethod):
     Name_First: str
     Name_Last: str
     Gender: int  # 0 M, 1 F, -1 Unknown
+    Date_of_Birth: DateTimeClass
     TreatmentNotes: List[TreatmentNoteClass]
 
     def __init__(self):
@@ -577,6 +578,7 @@ class PatientClass(BaseMethod):
         self.Gender = -1
         self.Cases = []
         self.TreatmentNotes = []
+        self.Date_of_Birth = DateTimeClass()
 
     def define_rs_uid(self):
         illegal_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
