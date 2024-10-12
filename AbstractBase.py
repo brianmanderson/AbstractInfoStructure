@@ -703,6 +703,7 @@ class PatientHeader(BaseMethod):
     DateLastModified: DateTimeClass
     Cases: List[StrippedDownCase]
     TreatmentNotes: List[TreatmentNoteClass]
+    DateOfBirth: DateTimeClass
 
     def __init__(self):
         self.Cases = []
@@ -710,6 +711,7 @@ class PatientHeader(BaseMethod):
         self.Name_First = ''
         self.Name_Last = ''
         self.Gender = -1
+        self.DateOfBirth = DateTimeClass()
 
     def delete_unapproved_cases(self):
         """
@@ -743,6 +745,7 @@ class PatientHeader(BaseMethod):
         self.Name_First = patient.Name_First
         self.RS_UID = patient.RS_UID
         self.DateLastModified = patient.DateLastModified
+        self.DateOfBirth = patient.DateOfBirth
         for case in patient.Cases:
             new_case = StrippedDownCase()
             new_case.build(case)
