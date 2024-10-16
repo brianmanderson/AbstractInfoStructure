@@ -890,6 +890,7 @@ class PatientHeaderDatabase(BaseMethod):
         patient: PatientHeader
         potential_files = [i for i in os.listdir(directory_path) if i.endswith("_Header.json")]
         if specific_mrns:
+            specific_mrns = [str(i) for i in specific_mrns]
             """
             If we have a list of specific MRNs to load, just load those patients
             """
