@@ -562,6 +562,19 @@ class TreatmentNoteClass(BaseMethod):
         return self.DateLastEdited.__repr__() + ': ' + self.StaffFirstName + ' ' + self.StaffLastName
 
 
+class QCLClass(BaseMethod):
+    Description: str
+    CreatedTime: DateTimeClass
+    DueTime: DateTimeClass
+    Completed: bool
+    ResponsibleStaff: str
+    CompletedStaff: str
+
+    def __repr__(self):
+        return (f"{self.Description} at {self.CreatedTime} due {self.DueTime}"
+                f" was {self.Completed} responsible {self.ResponsibleStaff} and done by {self.CompletedStaff}")
+
+
 class PatientClass(BaseMethod):
     RS_UID: str
     Patient_UID: int = 0
@@ -573,6 +586,7 @@ class PatientClass(BaseMethod):
     Gender: int  # 0 M, 1 F, -1 Unknown
     DateOfBirth: DateTimeClass
     TreatmentNotes: List[TreatmentNoteClass]
+    QCLs: List[QCLClass]
 
     def __init__(self):
         self.Name_First = ''
@@ -580,6 +594,7 @@ class PatientClass(BaseMethod):
         self.Gender = -1
         self.Cases = []
         self.TreatmentNotes = []
+        self.QCLs = []
         self.DateOfBirth = DateTimeClass()
 
     def define_rs_uid(self):
@@ -705,11 +720,13 @@ class PatientHeader(BaseMethod):
     DateLastModified: DateTimeClass
     Cases: List[StrippedDownCase]
     TreatmentNotes: List[TreatmentNoteClass]
+    QCLs: List[QCLClass]
     DateOfBirth: DateTimeClass
 
     def __init__(self):
         self.Cases = []
         self.TreatmentNotes = []
+        self.QCLs = []
         self.Name_First = ''
         self.Name_Last = ''
         self.Gender = -1
@@ -757,6 +774,15 @@ class PatientHeader(BaseMethod):
             new_note.Note = tx_note.Note
             new_note.DateLastEdited = tx_note.DateLastEdited
             self.TreatmentNotes.append(new_note)
+        for qcl in patient.QCLs:
+            new_qcl = QCLClass()
+            new_qcl.Description = qcl.Description
+            new_qcl.CreatedTime = qcl.CreatedTime
+            new_qcl.DueTime = qcl.DueTime
+            new_qcl.Completed = qcl.Completed
+            new_qcl.ResponsibleStaff = qcl.ResponsibleStaff
+            new_qcl.CompletedStaff = qcl.CompletedStaff
+            self.QCLs.append(new_qcl)
 
     def __repr__(self):
         return self.MRN
