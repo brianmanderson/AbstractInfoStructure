@@ -732,6 +732,13 @@ class PatientHeader(BaseMethod):
         self.Gender = -1
         self.DateOfBirth = DateTimeClass()
 
+    def define_rs_uid(self):
+        illegal_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
+        rs_id = self.MRN
+        for c in illegal_chars:
+            rs_id = rs_id.replace(c, "")
+        self.RS_UID = rs_id
+
     def delete_unapproved_cases(self):
         """
         Delete cases without approved plans, and delete unapproved plans
