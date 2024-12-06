@@ -778,6 +778,8 @@ class PatientHeader(BaseMethod):
             self.Cases.append(new_case)
         for tx_note in patient.TreatmentNotes:
             new_note = TreatmentNoteClass()
+            new_note.StaffLastName = tx_note.StaffLastName
+            new_note.StaffFirstName = tx_note.StaffFirstName
             new_note.Note = tx_note.Note
             new_note.DateLastEdited = tx_note.DateLastEdited
             self.TreatmentNotes.append(new_note)
