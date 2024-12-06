@@ -268,7 +268,9 @@ class RoiMaterial(BaseMethod):
 
 
 class OrganDataClass(BaseMethod):
-    OrganType: str
+    OrganType: str  # Can be Organ Type or Code Meaning (0008, 0104)
+    CodeValue: str  # Meant to be (0008, 01000)
+    CodeSchemeDesignator: str  # Meant to be (0008, 0102)
     ResponseFunctionTissueName: str
 
     def __repr__(self):
