@@ -183,7 +183,8 @@ class BaseMethod:
                         setattr(temp, attribute, data[attribute])
             return temp
         else:
-            raise ValueError("JSON")
+            x = 1
+            # raise ValueError("JSON")
 
 
 class DateTimeClass(BaseMethod):
@@ -240,6 +241,51 @@ class DateTimeClass(BaseMethod):
         self.day = int(day)
         self.hour = int(hour)
         self.minute = int(minute)
+
+    def __repr__(self):
+        return str(self.month) + '/' + str(self.day) + '/' + str(self.year)
+
+
+class ReducedDateTimeClass(BaseMethod):
+    year: int
+    month: int
+    day: int
+
+    def __init__(self):
+        self.year = 0
+        self.day = 1
+        self.month = 1
+
+    def __eq__(self, other):
+        if isinstance(other, ReducedDateTimeClass):
+            if self.__dict__ == other.__dict__:
+                return True
+        return False
+
+    def __sub__(self, other):
+        assert isinstance(other, ReducedDateTimeClass)
+        k = datetime(self.year, self.month, self.day, 0, 0, 0)
+        k2 = datetime(other.year, other.month, other.day, 0, 0, 0)
+        return k - k2
+
+    def from_rs_datetime(self, k):
+        self.year = k.Year
+        self.month = k.Month
+        self.day = k.Day
+
+    def from_python_datetime(self, k: datetime):
+        self.year = k.year
+        self.month = k.month
+        self.day = k.day
+
+    def from_pandas_timestamp(self, k):
+        self.from_python_datetime(k)
+
+    def from_string(self, k):
+        year, month, day, hour, minute = k.split('.')
+        self.year = int(year)
+        self.month = int(month)
+        self.day = int(day)
 
     def __repr__(self):
         return str(self.month) + '/' + str(self.day) + '/' + str(self.year)
@@ -553,7 +599,7 @@ class CaseClass(BaseMethod):
 
 
 class TreatmentNoteClass(BaseMethod):
-    DateLastEdited: DateTimeClass
+    DateLastEdited: ReducedDateTimeClass
     Note: str
     StaffFirstName: str
     StaffLastName: str
@@ -564,15 +610,14 @@ class TreatmentNoteClass(BaseMethod):
 
 class QCLClass(BaseMethod):
     Description: str
-    CreatedTime: DateTimeClass
-    DueTime: DateTimeClass
-    Completed: bool
+    CreatedTime: ReducedDateTimeClass
+    DueTime: ReducedDateTimeClass
     ResponsibleStaff: str
     CompletedStaff: str
 
     def __repr__(self):
         return (f"{self.Description} at {self.CreatedTime} due {self.DueTime}"
-                f" was {self.Completed} responsible {self.ResponsibleStaff} and done by {self.CompletedStaff}")
+                f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff}")
 
 
 class PatientClass(BaseMethod):
