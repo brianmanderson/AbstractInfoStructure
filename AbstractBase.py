@@ -216,10 +216,10 @@ class DateTimeClass(BaseMethod):
         return k - k2
 
     def from_rs_datetime(self, k):
-        if hasattr(k, 'year'):
-            self.year = k.year
-            self.month = k.month
-            self.day = k.day
+        if hasattr(k, 'Year'):
+            self.year = k.Year
+            self.month = k.Month
+            self.day = k.Day
             self.hour = k.Hour
             self.minute = k.Minute
             self.second = k.Second
