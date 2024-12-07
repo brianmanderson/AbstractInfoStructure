@@ -216,20 +216,22 @@ class DateTimeClass(BaseMethod):
         return k - k2
 
     def from_rs_datetime(self, k):
-        self.year = k.Year
-        self.month = k.Month
-        self.day = k.Day
-        self.hour = k.Hour
-        self.minute = k.Minute
-        self.second = k.Second
+        if hasattr(k, 'year'):
+            self.year = k.year
+            self.month = k.month
+            self.day = k.day
+            self.hour = k.Hour
+            self.minute = k.Minute
+            self.second = k.Second
 
     def from_python_datetime(self, k: datetime):
-        self.year = k.year
-        self.month = k.month
-        self.day = k.day
-        self.hour = k.hour
-        self.minute = k.minute
-        self.second = k.second
+        if hasattr(k, 'year'):
+            self.year = k.year
+            self.month = k.month
+            self.day = k.day
+            self.hour = k.hour
+            self.minute = k.minute
+            self.second = k.second
 
     def from_pandas_timestamp(self, k):
         self.from_python_datetime(k)
@@ -269,14 +271,19 @@ class ReducedDateTimeClass(BaseMethod):
         return k - k2
 
     def from_rs_datetime(self, k):
-        self.year = k.Year
-        self.month = k.Month
-        self.day = k.Day
+        if hasattr(k, 'Year'):
+            self.year = k.Year
+            self.month = k.Month
+            self.day = k.Day
 
     def from_python_datetime(self, k: datetime):
-        self.year = k.year
-        self.month = k.month
-        self.day = k.day
+        self.year = 0
+        self.month = 1
+        self.day = 1
+        if hasattr(k, 'year'):
+            self.year = k.year
+            self.month = k.month
+            self.day = k.day
 
     def from_pandas_timestamp(self, k):
         self.from_python_datetime(k)
