@@ -720,13 +720,11 @@ class PatientHeader(BaseMethod):
     DateLastModified: DateTimeClass
     Cases: List[StrippedDownCase]
     TreatmentNotes: List[TreatmentNoteClass]
-    QCLs: List[QCLClass]
     DateOfBirth: DateTimeClass
 
     def __init__(self):
         self.Cases = []
         self.TreatmentNotes = []
-        self.QCLs = []
         self.Name_First = ''
         self.Name_Last = ''
         self.Gender = -1
@@ -783,15 +781,15 @@ class PatientHeader(BaseMethod):
             new_note.Note = tx_note.Note
             new_note.DateLastEdited = tx_note.DateLastEdited
             self.TreatmentNotes.append(new_note)
-        for qcl in patient.QCLs:
-            new_qcl = QCLClass()
-            new_qcl.Description = qcl.Description
-            new_qcl.CreatedTime = qcl.CreatedTime
-            new_qcl.DueTime = qcl.DueTime
-            new_qcl.Completed = qcl.Completed
-            new_qcl.ResponsibleStaff = qcl.ResponsibleStaff
-            new_qcl.CompletedStaff = qcl.CompletedStaff
-            self.QCLs.append(new_qcl)
+        # for qcl in patient.QCLs:
+        #     new_qcl = QCLClass()
+        #     new_qcl.Description = qcl.Description
+        #     new_qcl.CreatedTime = qcl.CreatedTime
+        #     new_qcl.DueTime = qcl.DueTime
+        #     new_qcl.Completed = qcl.Completed
+        #     new_qcl.ResponsibleStaff = qcl.ResponsibleStaff
+        #     new_qcl.CompletedStaff = qcl.CompletedStaff
+        #     self.QCLs.append(new_qcl)
 
     def __repr__(self):
         return self.MRN
