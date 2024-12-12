@@ -1151,6 +1151,10 @@ class PatientDatabases(BaseMethod):
                                          specific_mrns, tqdm)
             self.Databases[database_directory] = database
 
+    def load_qcls(self, tqdm=None):
+        for db in self.Databases.values():
+            db.load_qcls(tqdm)
+
 
 class PatientHeaderDatabases(BaseMethod):
     HeaderDatabases: Dict[str, PatientHeaderDatabase]
@@ -1178,6 +1182,10 @@ class PatientHeaderDatabases(BaseMethod):
             header_database.load_from_directory(os.path.join(path_to_database_directories, database_directory),
                                                 specific_mrns, tqdm)
             self.HeaderDatabases[database_directory] = header_database
+
+    def load_qcls(self, tqdm=None):
+        for db in self.HeaderDatabases.values():
+            db.load_qcls(tqdm)
 
 
 def save_database(database: PatientDatabase, path: Union[str, bytes, os.PathLike]):
