@@ -66,7 +66,29 @@ def add_patient(a):
         if update:
             pbar.update()
         patient = PatientClass.from_json_file(file)
+        patient.FilePath = file
         patient_dictionary[patient.RS_UID] = patient
+        q.task_done()
+
+
+def load_qcls(a):
+    """
+    This works for both header and patient dictionaries, so keep it vague
+    :param a:
+    :return:
+    """
+    q: Queue
+    q, pbar, patient_dict = a
+    update = False
+    if pbar is not None:
+        update = True
+    while True:
+        mrn = q.get()
+        if mrn is None:
+            break
+        if update:
+            pbar.update()
+        patient_dict[mrn].load_qcls()
         q.task_done()
 
 
@@ -713,6 +735,11 @@ class PatientClass(BaseMethod):
         if os.path.exists(out_file.replace(".json", ".txt")):
             os.remove(out_file.replace(".json", ".txt"))
 
+    def load_qcls(self):
+        json_file = self.FilePath.replace('.json', 'QCLs.json')
+        if os.path.exists(json_file):
+            self.QCL_List = QCLListClass.from_json_file(json_file)
+
     def __repr__(self):
         return self.MRN
 
@@ -924,11 +951,41 @@ class PatientDatabase(BaseMethod):
                     pbar.update()
         return None
 
+    def load_qcls(self, tqdm=None):
+        pbar = None
+        if tqdm is not None:
+            pbar = tqdm(total=len(self.Patients), desc='Loading QCLs...')
+        if load_parallel:
+            thread_count = int(cpu_count() * 0.8 - 1)
+            q = Queue(maxsize=thread_count)
+            threads = []
+            a = (q, pbar, self.Patients)
+            for worker in range(thread_count):
+                t = Thread(target=load_qcls, args=(a,))
+                t.start()
+                threads.append(t)
+            for mrn in self.Patients.keys():
+                q.put(mrn)
+            for _ in range(thread_count):
+                q.put(None)
+            for t in threads:
+                t.join()
+        else:
+            for pat in self.Patients.values():
+                try:
+                    pat.load_qcls()
+                except:
+                    continue
+                if pbar is not None:
+                    pbar.update()
+
     def load_from_directory(self, directory_path: Union[str, bytes, os.PathLike], specific_mrns: List[str] = None,
                             tqdm=None):
         patient: PatientClass
         all_files = [i for i in os.listdir(directory_path) if i.endswith(".json")]
-        potential_files = [i for i in all_files if not i.endswith("_Header.json")]
+        header_files = [i for i in all_files if i.endswith('_Header.json')]
+        potential_files = [i.replace('_Header.json', '.json') for i in header_files
+                           if i.replace('_Header.json', '.json') in all_files]
         if specific_mrns:
             """
             If we have a list of specific MRNs to load, just load those patients
@@ -1018,6 +1075,34 @@ class PatientHeaderDatabase(BaseMethod):
         print("Loading from " + self.DBName)
         potential_files = [os.path.join(directory_path, i) for i in potential_files]
         self.load_files(potential_files=potential_files, tqdm=tqdm)
+
+    def load_qcls(self, tqdm=None):
+        pbar = None
+        if tqdm is not None:
+            pbar = tqdm(total=len(self.PatientHeaders), desc='Loading QCLs...')
+        if load_parallel:
+            thread_count = int(cpu_count() * 0.8 - 1)
+            q = Queue(maxsize=thread_count)
+            threads = []
+            a = (q, pbar, self.PatientHeaders)
+            for worker in range(thread_count):
+                t = Thread(target=load_qcls, args=(a,))
+                t.start()
+                threads.append(t)
+            for mrn in self.PatientHeaders.keys():
+                q.put(mrn)
+            for _ in range(thread_count):
+                q.put(None)
+            for t in threads:
+                t.join()
+        else:
+            for pat in self.PatientHeaders.values():
+                try:
+                    pat.load_qcls()
+                except:
+                    continue
+                if pbar is not None:
+                    pbar.update()
 
     def return_patient_database(self, tqdm=None) -> PatientDatabase:
         """
