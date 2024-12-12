@@ -90,7 +90,6 @@ def add_patient_header(a):
 
 
 class BaseMethod:
-
     def build(self, *args, **kwargs):
         pass
 
@@ -100,14 +99,19 @@ class BaseMethod:
     def __setitem__(self, key, value):
         setattr(self, key, value)
 
-    def to_json_file(self, json_file_path):
-        json_dict = self.to_json()
+    def to_json_file(self, json_file_path, exclude=None):
+        json_str = self.to_json(exclude=exclude)
         with open(json_file_path, 'w') as json_file:
-            json_file.write(json_dict)
+            json_file.write(json_str)
 
-    def to_json(self):
+    def to_json(self, exclude=None):
+        if exclude is None:
+            exclude = []
         json_dict = {'__' + self.__class__.__name__ + '__': True}
         for attribute, attribute_type in self.__annotations__.items():
+            if attribute in exclude:
+                # Skip excluded attributes
+                continue
             if not hasattr(self, attribute):
                 continue
             attribute_value = getattr(self, attribute)
@@ -627,6 +631,13 @@ class QCLClass(BaseMethod):
                 f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff}")
 
 
+class QCLListClass(BaseMethod):
+    QCLs: List[QCLClass]
+
+    def __init__(self):
+        self.QCLs = []
+
+
 class PatientClass(BaseMethod):
     RS_UID: str
     Patient_UID: int = 0
@@ -638,6 +649,8 @@ class PatientClass(BaseMethod):
     Gender: int  # 0 M, 1 F, -1 Unknown
     DateOfBirth: DateTimeClass
     TreatmentNotes: List[TreatmentNoteClass]
+    FilePath: Union[str, bytes, os.PathLike]
+    QCL_List: QCLListClass
     QCLs: List[QCLClass]
 
     def __init__(self):
@@ -646,7 +659,7 @@ class PatientClass(BaseMethod):
         self.Gender = -1
         self.Cases = []
         self.TreatmentNotes = []
-        self.QCLs = []
+        self.QCL_List = QCLListClass()
         self.DateOfBirth = DateTimeClass()
 
     def define_rs_uid(self):
@@ -689,7 +702,13 @@ class PatientClass(BaseMethod):
     def save_to_directory(self, directory_path):
         out_file_name = self.return_out_file_name()
         out_file = os.path.join(directory_path, out_file_name)
-        self.to_json_file(out_file)
+        self.to_json_file(out_file, exclude=["QCLs", "QCL_List"])
+        if hasattr(self, 'QCLs'):
+            for qcl in self.QCLs:
+                self.QCL_List.QCLs.append(qcl)
+        if self.QCL_List.QCLs:
+            out_file_name = out_file_name.replace('.json', 'QCLs.json')
+            self.QCL_List.to_json_file(os.path.join(directory_path, out_file_name))
         self.save_header_to_directory(directory_path)
         if os.path.exists(out_file.replace(".json", ".txt")):
             os.remove(out_file.replace(".json", ".txt"))
@@ -772,11 +791,13 @@ class PatientHeader(BaseMethod):
     DateLastModified: DateTimeClass
     Cases: List[StrippedDownCase]
     TreatmentNotes: List[TreatmentNoteClass]
+    QCL_List: QCLListClass
     DateOfBirth: DateTimeClass
 
     def __init__(self):
         self.Cases = []
         self.TreatmentNotes = []
+        self.QCL_List = QCLListClass()
         self.Name_First = ''
         self.Name_Last = ''
         self.Gender = -1
@@ -812,7 +833,15 @@ class PatientHeader(BaseMethod):
                          f"{last_mod.year}.{last_mod.month}.{last_mod.day}.{last_mod.hour}.{last_mod.minute}")
         out_file_name += "_Header.json"
         out_file = os.path.join(directory_path, out_file_name)
-        self.to_json_file(out_file)
+        self.to_json_file(out_file, exclude=["QCLs", "QCL_List"])
+        """
+        Exclude this from the json file as well, specifically load if wanted
+        """
+
+    def load_qcls(self):
+        json_file = self.FilePath.replace('_Header.json', 'QCLs.json')
+        if os.path.exists(json_file):
+            self.QCL_List = QCLListClass.from_json_file(json_file)
 
     def build(self, patient: PatientClass):
         self.MRN = patient.MRN
@@ -833,15 +862,8 @@ class PatientHeader(BaseMethod):
             new_note.Note = tx_note.Note
             new_note.DateLastEdited = tx_note.DateLastEdited
             self.TreatmentNotes.append(new_note)
-        # for qcl in patient.QCLs:
-        #     new_qcl = QCLClass()
-        #     new_qcl.Description = qcl.Description
-        #     new_qcl.CreatedTime = qcl.CreatedTime
-        #     new_qcl.DueTime = qcl.DueTime
-        #     new_qcl.Completed = qcl.Completed
-        #     new_qcl.ResponsibleStaff = qcl.ResponsibleStaff
-        #     new_qcl.CompletedStaff = qcl.CompletedStaff
-        #     self.QCLs.append(new_qcl)
+        for qcl in patient.QCL_List.QCLs:
+            self.QCL_List.QCLs.append(qcl)
 
     def __repr__(self):
         return self.MRN
@@ -894,6 +916,7 @@ class PatientDatabase(BaseMethod):
             for file in potential_files:
                 try:
                     patient = PatientClass.from_json_file(file)
+                    patient.FilePath = file
                     self.Patients[patient.RS_UID] = patient
                 except:
                     continue
@@ -966,6 +989,7 @@ class PatientHeaderDatabase(BaseMethod):
             for file in potential_files:
                 try:
                     patient_header = PatientHeader.from_json_file(file)
+                    patient_header.FilePath = file
                     self.PatientHeaders[patient_header.RS_UID] = patient_header
                 except:
                     continue
