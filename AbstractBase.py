@@ -280,7 +280,7 @@ class ReducedDateTimeClass(BaseMethod):
     day: int
 
     def __init__(self):
-        self.year = 0
+        self.year = 1
         self.day = 1
         self.month = 1
 
