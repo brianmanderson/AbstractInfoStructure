@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 import os
 import json
 from datetime import datetime
@@ -1006,6 +1006,8 @@ class PatientDatabase(BaseMethod):
         for patient in self.Patients.values():
             patient.save_to_directory(directory_path)
 
+    def __repr__(self):
+        return f"{self.DBName} with {len(self.Patients)}"
 
 class PatientHeaderDatabase(BaseMethod):
     DBName: str
@@ -1115,6 +1117,9 @@ class PatientHeaderDatabase(BaseMethod):
         patient_database.load_files(potential_files, tqdm=tqdm)
         return patient_database
 
+    def __repr__(self):
+        return f"{self.DBName} with {len(self.PatientHeaders)}"
+
 
 class PatientDatabases(BaseMethod):
     Databases: Dict[str, PatientDatabase]
@@ -1140,15 +1145,23 @@ class PatientDatabases(BaseMethod):
             db.save_to_directory(db_path)
 
     def build_from_folder(self, path_to_database_directories: Union[str, bytes, os.PathLike],
-                          specific_mrns: List[str] = None, tqdm=None):
+                          specific_mrns: Optional[List[str]] = None, tqdm=None,
+                          specific_folders: Optional[List[str]] = None):
         database_directories = []
         for root, database_directories, files in os.walk(path_to_database_directories):
             break
         for database_directory in database_directories:
+            if specific_folders:
+                if database_directory not in specific_folders:
+                    continue
             database = PatientDatabase(database_directory)
             database.load_from_directory(os.path.join(path_to_database_directories, database_directory),
                                          specific_mrns, tqdm)
             self.Databases[database_directory] = database
+
+    def load_qcls(self, tqdm=None):
+        for db in self.Databases.values():
+            db.load_qcls(tqdm)
 
 
 class PatientHeaderDatabases(BaseMethod):
@@ -1168,15 +1181,23 @@ class PatientHeaderDatabases(BaseMethod):
         return out_databases
 
     def build_from_folder(self, path_to_database_directories: Union[str, bytes, os.PathLike],
-                          specific_mrns: List[str] = None, tqdm=None):
+                          specific_mrns: Optional[List[str]] = None, tqdm=None,
+                          specific_folders: Optional[List[str]] = None):
         database_directories = []
         for root, database_directories, files in os.walk(path_to_database_directories):
             break
         for database_directory in database_directories:
+            if specific_folders:
+                if database_directory not in specific_folders:
+                    continue
             header_database = PatientHeaderDatabase(database_directory)
             header_database.load_from_directory(os.path.join(path_to_database_directories, database_directory),
                                                 specific_mrns, tqdm)
             self.HeaderDatabases[database_directory] = header_database
+
+    def load_qcls(self, tqdm=None):
+        for db in self.HeaderDatabases.values():
+            db.load_qcls(tqdm)
 
 
 def save_database(database: PatientDatabase, path: Union[str, bytes, os.PathLike]):
