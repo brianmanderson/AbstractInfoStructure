@@ -650,7 +650,7 @@ class QCLClass(BaseMethod):
 
     def __repr__(self):
         return (f"{self.Description} at {self.CreatedTime}"
-                f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff} at {self.CompletedTime}")
+                f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff} {self.CompletedTime}")
 
 
 class QCLListClass(BaseMethod):
