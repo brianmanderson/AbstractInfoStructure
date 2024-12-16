@@ -644,13 +644,13 @@ class TreatmentNoteClass(BaseMethod):
 class QCLClass(BaseMethod):
     Description: str
     CreatedTime: ReducedDateTimeClass
-    DueTime: ReducedDateTimeClass
+    CompletedTime: ReducedDateTimeClass or None
     ResponsibleStaff: str
     CompletedStaff: str
 
     def __repr__(self):
-        return (f"{self.Description} at {self.CreatedTime} due {self.DueTime}"
-                f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff}")
+        return (f"{self.Description} at {self.CreatedTime}"
+                f" responsible {self.ResponsibleStaff} and done by {self.CompletedStaff} at {self.CompletedTime}")
 
 
 class QCLListClass(BaseMethod):
@@ -673,7 +673,6 @@ class PatientClass(BaseMethod):
     TreatmentNotes: List[TreatmentNoteClass]
     FilePath: Union[str, bytes, os.PathLike]
     QCL_List: QCLListClass
-    QCLs: List[QCLClass]
 
     def __init__(self):
         self.Name_First = ''
