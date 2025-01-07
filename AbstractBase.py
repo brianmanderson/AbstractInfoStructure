@@ -700,6 +700,7 @@ class PatientClass(BaseMethod):
         self.Cases = []
         self.TreatmentNotes = []
         self.QCL_List = QCLListClass()
+        self.DateLastModified = DateTimeClass()
         self.DateOfBirth = DateTimeClass()
 
     def define_rs_uid(self):
