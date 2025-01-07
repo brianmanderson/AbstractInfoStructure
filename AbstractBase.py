@@ -241,26 +241,40 @@ class DateTimeClass(BaseMethod):
         k2 = datetime(other.year, other.month, other.day, other.hour, other.minute, other.second)
         return k - k2
 
-    def from_rs_datetime(self, k):
+    def from_datetime(self, k):
         if hasattr(k, 'Year'):
             self.year = k.Year
-            self.month = k.Month
-            self.day = k.Day
-            self.hour = k.Hour
-            self.minute = k.Minute
-            self.second = k.Second
-
-    def from_python_datetime(self, k: datetime):
-        if hasattr(k, 'year'):
+        elif hasattr(k, 'year'):
             self.year = k.year
+        if hasattr(k, 'Month'):
+            self.month = k.Month
+        elif hasattr(k, 'month'):
             self.month = k.month
+        if hasattr(k, 'Day'):
+            self.day = k.Day
+        elif hasattr(k, 'day'):
             self.day = k.day
+        if hasattr(k, 'Hour'):
+            self.hour = k.Hour
+        elif hasattr(k, 'hour'):
             self.hour = k.hour
+        if hasattr(k, 'Minute'):
+            self.minute = k.Minute
+        elif hasattr(k, 'minute'):
             self.minute = k.minute
+        if hasattr(k, 'Second'):
+            self.second = k.Second
+        elif hasattr(k, 'second'):
             self.second = k.second
 
+    def from_rs_datetime(self, k):
+        self.from_datetime(k)
+
+    def from_python_datetime(self, k):
+        self.from_datetime(k)
+
     def from_pandas_timestamp(self, k):
-        self.from_python_datetime(k)
+        self.from_datetime(k)
 
     def from_string(self, k):
         year, month, day, hour, minute = k.split('.')
@@ -296,23 +310,28 @@ class ReducedDateTimeClass(BaseMethod):
         k2 = datetime(other.year, other.month, other.day, 0, 0, 0)
         return k - k2
 
-    def from_rs_datetime(self, k):
+    def from_datetime(self, k):
         if hasattr(k, 'Year'):
             self.year = k.Year
-            self.month = k.Month
-            self.day = k.Day
-
-    def from_python_datetime(self, k: datetime):
-        self.year = 0
-        self.month = 1
-        self.day = 1
-        if hasattr(k, 'year'):
+        elif hasattr(k, 'year'):
             self.year = k.year
+        if hasattr(k, 'Month'):
+            self.month = k.Month
+        elif hasattr(k, 'month'):
             self.month = k.month
+        if hasattr(k, 'Day'):
+            self.day = k.Day
+        elif hasattr(k, 'day'):
             self.day = k.day
 
+    def from_rs_datetime(self, k):
+        self.from_datetime(k)
+
+    def from_python_datetime(self, k: datetime):
+        self.from_datetime(k)
+
     def from_pandas_timestamp(self, k):
-        self.from_python_datetime(k)
+        self.from_datetime(k)
 
     def from_string(self, k):
         year, month, day, hour, minute = k.split('.')
